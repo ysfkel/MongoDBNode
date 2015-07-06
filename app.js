@@ -19,20 +19,51 @@ MongoClient.connect(url,function(err,db){
 		last_name:'Kelo',
 		accounts:[
 			{
-				account_balance:'50000000',
+				account_balance:50000000,
 				account_type:'Investment',
 				currency:'USA'
 			}
 		]
-	},function(err,result){
+	},function(err,docs){
 		if(err){
 				close();
 			return console.error(err);
 		}
 		console.log('inserted: ');
-		console.log(result);
-		close();
-		return console.log('inserted '+result.length + ' docs');
+		console.log(docs);
+		
+		var updatedPerson=docs[0];
+	    updatedPerson.accounts[0].account_balance +=1000000;
+		//{w:1} is write concern 0,1,2
+		bankData.update({_id:new ObjectId(updatedPerson._id)},updatedPerson,{w:1},function(err,count) {
+			if(err){
+				return console.error(err);
+			}
+			console.log(count+' document updated successfully');
+			
+			bankData.findOne({_id:new ObjectId(updatedPerson._id)},function(err,doc) {
+				if(err){
+					close();
+					return console.error(err);
+				}
+				console.log('READ ONE ITEM')
+				console.log(doc)
+				
+				bankData.remove({_id:new ObjectId(updatedPerson._id)},function(err,count) {
+					if(err){
+						close();
+						return console.error(err);
+					}
+					console.log('removed '+count+' item')
+					close();
+				})
+				
+			})
+			
+		})
+		
+		
+		return console.log('inserted '+docs.length + ' docs');
 	})
 	
 	function close(params) {

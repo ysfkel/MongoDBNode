@@ -26,6 +26,7 @@ MongoClient.connect(url,function(err,db){
 		]
 	},function(err,result){
 		if(err){
+				close();
 			return console.error(err);
 		}
 		console.log('inserted: ');
@@ -37,5 +38,5 @@ MongoClient.connect(url,function(err,db){
 	function close(params) {
 		return db.close();
 	}
-	//return db.close();
+
 })
